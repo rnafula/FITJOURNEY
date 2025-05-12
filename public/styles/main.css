@@ -1,0 +1,100 @@
+body {
+  background-color: rgb(198, 175, 131);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+header {
+  display: flex;
+  background-color: #ddba86;
+  padding: 20px;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.main {
+}
+.intro_text {
+  background-color: #ddba8661;
+  font-size: 20px;
+  font-weight: bold;
+  color: #91bac7;
+  border-radius: 8px;
+  width: 40%;
+  margin: 50px auto;
+  padding: 20px;
+  text-align: center;
+  background-image: url("/images/man_workout.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.features {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 80%;
+  margin: 50px auto;
+}
+.feature {
+  width: 20%;
+  color: #076396;
+  background-color: #ddba86;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+}
+.get_started {
+  background-color: #076396;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  width: 200px;
+  text-align: center;
+  margin: auto;
+}
+
+.get_started:hover {
+  background-color: darkgreen;
+}
+
+.signup {
+  background-color: #ddba86;
+  padding: 20px;
+  border-radius: 5px;
+  width: 40%;
+  margin: 100px auto;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  justify-items: start;
+  padding: 20px;
+  color: black;
+}
+.signup p {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+form div {
+  display: flex;
+  gap: 10px;
+  align-items: start;
+}
+button[type="submit"] {
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100px;
+}
