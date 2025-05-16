@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="/styles/main.css" />
   </head>
   <body>
+    <%- include("_header.ejs") %>
     <div class="signup">
       <p>Enter your information to create an account</p>
-      <form action="http://localhost:8080" method="POST">
+      <form action="http://localhost:8080/signup" method="post">
         <div>
           <label for="username">Username</label>
           <input type="text" name="username" id="username" required />
@@ -24,6 +25,7 @@
           <input type="text" name="password_hash" id="password" required />
         </div>
         <button type="submit">Sign Up</button>
+        <p>Already have Account?<a href="/login"> Login</a></p>
       </form>
     </div>
   </body>

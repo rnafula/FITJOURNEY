@@ -1,5 +1,5 @@
 body {
-  background-color: rgb(198, 175, 131);
+  background-color: #bbdcee;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -18,13 +18,13 @@ header {
   background-color: #ddba8661;
   font-size: 20px;
   font-weight: bold;
-  color: #91bac7;
+  color: #076396;
   border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   width: 40%;
-  margin: 50px auto;
+  margin: 30px auto;
   padding: 20px;
   text-align: center;
-  background-image: url("/images/man_workout.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -40,7 +40,7 @@ header {
 .feature {
   width: 20%;
   color: #076396;
-  background-color: #ddba86;
+  background-color: #ddba8661;
   padding: 10px;
   text-align: center;
   border-radius: 5px;
