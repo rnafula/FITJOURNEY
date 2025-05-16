@@ -23,8 +23,25 @@ FitJourney is a web application designed to help users track and manage their fi
   - Admin dashboard for managing users and accounts
   - Fitness instructor dashboard for creating workout plans,( managing client sessions and progress-this feature will be developed later)
   - Nutritionist dashboard for creating meal plans ( and managing client progress -this feature will be developed later)
+  - General user dashboard for tracking progress and accessing workout and meal plans
 - Responsive UI with EJS templates and CSS styling
 - User authentication and authorization with bcrypt and express-session
+
+## User Roles and Capabilities
+
+- Admin:
+  - Can manage all users, accounts, and dashboards
+- Fitness Instructor:
+  - Can create workout plans
+  - manage client sessions and progress
+  - have a general user account
+- Nutritionist:
+  - Can create meal plans
+  - manage client progress
+  - have a general user account
+- General User:
+  - Can view their dashboard
+  - view and pick workout and meal plans
 
 ## Project Structure
 
