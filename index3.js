@@ -14,21 +14,14 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Database connection
-const dbConnection = mysql.createConnection({
+const dbConfig = {
   host: "localhost",
   user: "root",
   password: "",
-  database: "fitjourney_db",
-});
+  database: "ft_db",
+};
 
 // Connect to database and handle errors
-dbConnection.connect((err) => {
-  if (err) {
-    console.error("Database connection failed:", err);
-    return;
-  }
-  console.log("Connected to database");
-});
 
 // Middleware
 app.use(cors());
@@ -55,32 +48,31 @@ const adminRoutes = [
 ];
 
 app.use((req, res, next) => {
-  console.log(req.path)
+  console.log(req.path);
   // Set user data for views if logged in
   if (req.session.user) {
-     res.locals.user = req.session.user
+    res.locals.user = req.session.user;
 
-     const userRole = req.session.user.role;
-     if(userRole == "nutritionist" && nutritionistRoutes.includes(req.path)){
-      next()
-     } else if(userRole ="instructor" && fit_instructorRoutes.includes(req.path)){
-      next()
-     } else if(userRole ="admin" && adminRoutes.includes(req.path)){
-      next()
-     }
-     else{
-      if(userRole ="regular" && regular_userRoutes.includes(req.path)){
-        next()
+    const userRole = req.session.user.roles;
+    if (userRole == "nutritionist" && nutritionistRoutes.includes(req.path)) {
+      next();
+    } else if (
+      (userRole = "instructor" && fit_instructorRoutes.includes(req.path))
+    ) {
+      next();
+    } else if ((userRole = "admin" && adminRoutes.includes(req.path))) {
+      next();
+    } else {
+      if ((userRole = "regular" && regular_userRoutes.includes(req.path))) {
+        next();
       }
-     }
-   
+    }
+  } else {
+    if (publicRoutes.includes(req.path)) {
+      next(); // Allow access to public routes
+    }
   }
-  else{
-    res.redirect("/login")
-  }
-
-
-})
+});
 
 // Routes
 app.get("/", (req, res) => {
@@ -108,69 +100,83 @@ app.get("/fit_instructor/dashboard", (req, res) => {
 });
 
 // POST routes
+
+const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 app.post("/signup", (req, res) => {
   const { username, email, password_hash } = req.body;
 
-  // Check if email already exists
+  // Validate input
+  if (!username || !email || !password_hash) {
+    return res.status(400).send("All fields are required");
+  }
+
+  if (!isEmailValid.test(email)) {
+    return res.status(400).send("Invalid email format");
+  }
+
+  // Hash the password
+  const hashedpassword = bcrypt.hashSync(password_hash, 10);
+
+  const dbConnection = mysql.createConnection(dbConfig);
+
+  dbConnection.connect();
+
+  // Check if user already exists
   dbConnection.query(
-    "SELECT * FROM users WHERE email = ?", [email], (err, result) => {
+    "SELECT * FROM users WHERE email = ?",
+    [email],
+    (err, results) => {
       if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ error: "Database error" });
+        console.error("DB Error:", err);
+        dbConnection.end();
+        return res.status(500).send("Server error while checking user");
       }
 
-      if (result.length > 0) { 
-        return res
-          .status(400)
-          .send("Email already exists, please use another email or login");
+      if (results.length > 0) {
+        dbConnection.end();
+        return res.status(400).send("User already exists");
       }
 
-      // Get role_id for 'regular' role
+      // Insert new user
       dbConnection.query(
-        "SELECT id FROM roles WHERE name = ?",
-        ["regular"],
-        (err, roleResult) => {
-          if (err) {
-            console.error("Error fetching role:", err);
-            return res.status(500).send("Error signing up");
+        "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+        [username, email, hashedpassword],
+        (error) => {
+          dbConnection.end();
+
+          if (error) {
+            console.error("DB Error:", error);
+            return res.status(500).send("Server error while signing up");
           }
 
-          if (roleResult.length === 0) {
-            return res.status(500).send("Default role not found");
-          }
-
-          const roleId = roleResult[0].id;
-
-          // Hash password and insert user
-          const hashedPassword = bcrypt.hashSync(password_hash, 10);
-          dbConnection.query(
-            "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
-            [username, email, hashedPassword],
-            (err) => {
-              if (err) {
-                console.error("Error signing up:", err);
-                return res.status(500).send("Error signing up");
-              }
-              res.redirect("/login");
-            }
-          );
+          return res.redirect("/login");
         }
       );
     }
   );
 });
-app.post("/login", (req, res) => {
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+// Login route
+/* app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   dbConnection.query(
-    "SELECT * FROM users WHERE email = ?", [email], (error, userData) => {
+    "SELECT * FROM users WHERE email = ?",
+    [email],
+    (error, userData) => {
       if (error) {
         console.error("DB Error:", error);
-        return res.status(500).render("500.ejs");
+        return res.status(500).send("Server error while logging in");
       }
 
       if (userData.length === 0) {
-        return res.status(401).send("User not found");
+        return res.status(401).send("User not found, please sign up");
       }
 
       const user = userData[0];
@@ -203,7 +209,7 @@ app.post("/login", (req, res) => {
       }
     }
   );
-});
+}); */
 
 /* app.post("/login", (req, res) => {
   const { email, password_hash } = req.body;
