@@ -39,7 +39,11 @@
     <%- include("../_header.ejs") %>
 
     <main>
-      <h1>Hi, Person</h1>
+      <% if(locals.user){ %>
+      <h1>Hi, <%= locals.users.username %></h1>
+      <% }else{%>
+      <h1>Hi, User</h1>
+      <% } %>
     </main>
   </body>
 </html>

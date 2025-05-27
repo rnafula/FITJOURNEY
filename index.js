@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const ejs = require("ejs");
 const session = require("express-session");
 const mysql = require("mysql");
+const multer = require("multer");
+const upload = multer({ dest: "public/images" });
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -29,6 +31,49 @@ app.use(
 );
 
 //authorization middleware
+const publicRoutes = ["/", "/signup", "/login"];
+const nutritionistRoutes = ["/nutritionist/dashboard", ...publicRoutes];
+const fit_instructorRoutes = ["/fit_instructor/dashboard", ...publicRoutes];
+const regular_userRoutes = ["/regular_user/dashboard", ...publicRoutes];
+const adminRoutes = [
+  ...nutritionistRoutes,
+  ...fit_instructorRoutes,
+  ...regular_userRoutes,
+  ...publicRoutes,
+];
+app.use((req, res, next) => {
+  console.log(req.path);
+
+  if (req.session.user) {
+    res.locals.user = req.session.user; // send user data to views/ejs
+    // user islogged in  --- go ahead and check role and route they are accessing
+    const userRole = req.session.user.name; // get user role from session
+    if (userRole === "nutritionist" && nutritionistRoutes.includes(req.path)) {
+      // super admin - allow access to super admin routes
+      next();
+    } else if (
+      userRole === "instructor" &&
+      fit_instructorRoutes.includes(req.path)
+    ) {
+      // receptionist - allow access to receptionist routes
+      next();
+    } else if (
+      userRole === "regular" &&
+      regular_userRoutes.includes(req.path)
+    ) {
+      // manager - allow access to manager routes
+      next();
+    } else if (userRole === "admin" && adminRoutes.includes(req.path)) {
+      // manager - allow access to manager routes
+      next();
+    } else {
+      res.status(401);
+    }
+  } else {
+    res.redirect("/login");
+  }
+});
+
 //routes
 app.get("/", (req, res) => {
   res.render("index.ejs");
@@ -42,6 +87,13 @@ app.get("/login", (req, res) => {
 app.get("/regular_user/dashboard", (req, res) => {
   res.render("regular_user/dashboard_R.ejs");
 });
+app.get("/nutritionist/dashboard", (req, res) => {
+  res.render("nutritionist/dashboard_N.ejs");
+});
+app.get("/fit_instructor/dashboard", (req, res) => {
+  res.render("fit_instructor/dashboard_I.ejs");
+});
+
 //post routes
 app.post("/signup", (req, res) => {
   console.log(req.body);
@@ -93,7 +145,7 @@ app.post("/login", (req, res) => {
           );
           if (isPasswordValid) {
             req.session.user = user;
-            res.redirect("regular_user/dashboard_R.ejs");
+            res.redirect("regular_user/dashboard");
           } else {
             res.status(401).send("Invalid password");
           }
@@ -104,6 +156,6 @@ app.post("/login", (req, res) => {
 });
 
 //port
-app.listen(8080, () => {
-  console.log("Server is running on port 8080");
+app.listen(9000, () => {
+  console.log("Server is running on port 9000");
 });

@@ -12,41 +12,55 @@ header {
   text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-.main {
+
+.logo {
+  display: block;
+  width: 20%;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 }
-.intro_text {
-  background-color: #ddba8661;
+
+.text {
+  display: flex;
+  flex-direction: column;
   font-size: 20px;
   font-weight: bold;
-  color: #076396;
-  border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  width: 40%;
-  margin: 30px auto;
-  padding: 20px;
   text-align: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  justify-content: center;
+  padding: 4px 4px;
+  border-radius: 8px;
+
+  background-color: #a2d0e8;
+  /* color: #076396; */
+  color: black;
+  width: 50%;
+}
+.text_and_logo {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 50px auto;
+  gap: 50px;
+  width: 70%;
 }
 .features {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
+  /*   flex-wrap: wrap;
+ */
   align-items: center;
   width: 80%;
   margin: 50px auto;
 }
 .feature {
   width: 20%;
-  color: #076396;
-  background-color: #ddba8661;
+  color: black;
+  background-color: #a2d0e8;
   padding: 10px;
   text-align: center;
   border-radius: 5px;
 }
 .get_started {
-  background-color: #076396;
+  background-color: rgb(78, 171, 78);
   color: white;
   padding: 10px 20px;
   border: none;
@@ -56,19 +70,19 @@ header {
   display: block;
   width: 200px;
   text-align: center;
-  margin: auto;
 }
 
 .get_started:hover {
-  background-color: darkgreen;
+  background-color: #076396;
 }
 
 .signup {
-  background-color: #ddba86;
+  background-color: #a2d0e8;
   padding: 20px;
   border-radius: 5px;
-  width: 40%;
+  width: 30%;
   margin: 100px auto;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 form {
   display: flex;
@@ -76,7 +90,7 @@ form {
   gap: 30px;
   align-items: center;
   justify-items: start;
-  padding: 20px;
+  padding: 10px;
   color: black;
 }
 .signup p {
@@ -84,11 +98,19 @@ form {
   font-weight: bold;
   text-align: center;
 }
-form div {
+input[type="text"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+/* form div {
   display: flex;
   gap: 10px;
   align-items: start;
-}
+} */
 button[type="submit"] {
   background-color: green;
   color: white;
@@ -96,5 +118,10 @@ button[type="submit"] {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100px;
+  width: 100%;
+}
+.get_started_container {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
 }

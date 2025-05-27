@@ -7,18 +7,26 @@
     <link rel="stylesheet" href="/styles/main.css" />
   </head>
   <body>
-    <%- include("_header.ejs") %>
     <div class="signup">
-      <p>Enter your information to go back to your recent activity</p>
-      <form action="http://localhost:8080" method="get">
+      <p>Login</p>
+      <form action="/login" method="POST">
         <div>
-          <label for="username">Username</label>
-          <input type="text" name="username" id="username" required />
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter Username"
+          />
         </div>
 
         <div>
-          <label for="password">Password</label>
-          <input type="text" name="password_hash" id="password" required />
+          <input
+            type="text"
+            name="password_hash"
+            id="password"
+            placeholder="Password"
+            required
+          />
         </div>
         <button type="submit">Sign In</button>
         <p>Don't have an account?<a href="/signup"> Sign Up</a></p>

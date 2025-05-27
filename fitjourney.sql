@@ -31,6 +31,7 @@ CREATE TABLE user_roles (
 );
 CREATE TABLE user_profiles (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  profile_picture VARCHAR(255),
   user_id INT NOT NULL,
   age INT,
   gender ENUM('male', 'female', 'other'),

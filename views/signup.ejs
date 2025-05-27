@@ -7,24 +7,44 @@
     <link rel="stylesheet" href="/styles/main.css" />
   </head>
   <body>
-    <%- include("_header.ejs") %>
     <div class="signup">
-      <p>Enter your information to create an account</p>
-      <form action="http://localhost:8080/signup" method="post">
+      <p>Create Account</p>
+      <form action="http://localhost:9000/signup" method="post">
         <div>
-          <label for="username">Username</label>
-          <input type="text" name="username" id="username" required />
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter Username"
+            required
+          />
         </div>
         <div>
-          <label for="email">Email</label>
-          <input type="email" name="email" id="email" required />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Enter Email"
+          />
         </div>
 
         <div>
-          <label for="password">Password</label>
-          <input type="text" name="password_hash" id="password" required />
+          <input
+            type="text"
+            name="password_hash"
+            id="password"
+            placeholder="Set Password"
+            required
+          />
         </div>
+        <select name="role" id="">
+          <option value="" disabled selected>Select Account Type</option>
+          <option value="user">1.Regular</option>
+          <option value="trainer">2.Trainer</option>
+          <option value="nutritionist">3.Nutritionist</option>
+        </select>
         <button type="submit">Sign Up</button>
+
         <p>Already have Account?<a href="/login"> Login</a></p>
       </form>
     </div>

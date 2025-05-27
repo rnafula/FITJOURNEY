@@ -10,11 +10,13 @@
     <!--  <header class="hero">
       <img src="/images/fj_logo.png" alt="fj_logo" width="5%" />
     </header> -->
-    <%- include("_header.ejs") %>
     <main class="main">
-      <div class="intro_text">
-        <h3>Track your fitness journey with FitJourney</h3>
-        <p>Log your workouts, meals, and progress.</p>
+      <div class="text_and_logo">
+        <img class="logo" src="/images/fj_logo.png" alt="fj_logo" />
+        <p class="text">
+          <span>Fitjourney helps you keep fit.</span> <br />
+          <span>You can also help others keep fit with your expertise</span>
+        </p>
       </div>
       <section class="features">
         <div class="feature">
@@ -22,36 +24,23 @@
           <p>Log your workouts and track your progress.</p>
         </div>
         <div class="feature">
-          <h4>Mean Tracking</h4>
+          <h4>Meal Tracking</h4>
           <p>Log your workouts and track your progress.</p>
         </div>
         <div class="feature">
           <h4>Trainer account</h4>
-          <p>Log your workouts and track your progress.</p>
+          <p>Register as a trainer, post workouts and get clients</p>
         </div>
         <div class="feature">
           <h4>Nutritionist account</h4>
-          <p>Log your workouts and track your progress.</p>
+          <p>Register as a Nutritionist, post mealplans and get clients</p>
         </div>
-        <!--  <div class="feature">
-          <h4>Set your goals</h4>
-          <p>Log your workouts and track your progress.</p>
-        </div>
-        <div class="feature">
-          <h4>Set your goals</h4>
-          <p>Log your workouts and track your progress.</p>
-        </div>
-        <div class="feature">
-          <h4>Set your goals</h4>
-          <p>Log your workouts and track your progress.</p>
-        </div>
-        <div class="feature">
-          <h4>Set your goals</h4>
-          <p>Log your workouts and track your progress.</p>
-        </div> -->
       </section>
 
-      <a href="/signup" class="get_started">Get Started</a>
+      <div class="get_started_container">
+        <a href="/signup" class="get_started">Get Started</a>
+        <a href="/login" class="get_started">Login</a>
+      </div>
     </main>
   </body>
 </html>
