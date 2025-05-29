@@ -2,26 +2,65 @@
   <img src="/images/fj_logo.png" alt="" />
 
   <nav class="navbar">
-    <a href="#">Home</a>
-    <a href="#">Contact Us</a>
+    <%if (user && user.role === 'nutritionist'){%>
+    <a href="/">Home</a>
+    <!--     <a href="https:/wa.me/+254790472140">Contact Us</a> -->
+    <a href="#profile">Profile</a>
+    <a href="#workout">Premium</a>
+    <a href="#nutrition">Create Meal Plans</a>
+    <a href="#progress">Progress</a>
+    <a href="/logout">Logout</a>
+    <%} else if (user && user.role === 'instructor'){%>
+    <a href="/">Home</a>
+    <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
+ -->
+    <a href="#profile">Profile</a>
+    <a href="#workout">Premium</a>
+    <a href="#nutrition">Create Workout Plans</a>
+    <a href="#progress">Progress</a>
+    <a href="/logout">Logout</a>
+    <%} else if (user && user.role === 'regular'){%>
+    <a href="/">Home</a>
+    <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
+ -->
+    <a href="#profile">Profile</a>
+    <a href="/regular/available_plans">Available Plans</a>
+    <a href="#nutrition">My Plans</a>
+    <a href="#progress">My Progress</a>
+    <a href="/logout">Logout</a>
+    <%} else if (user && user.role === 'admin'){%>
+    <a href="/">Home</a>
+    <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
+ -->
     <a href="#profile">Profile</a>
     <a href="#workout">Workout Plans</a>
     <a href="#nutrition">Nutrition Plans</a>
     <a href="#progress">Progress</a>
+    <a href="/logout">Logout</a>
+    <%} else{%>
+    <a href="/">Home</a>
+    <a href="https:/wa.me/+254790472140">Contact Us</a>
+    <a href="#profile">Profile</a>
+    <a href="#workout">Workout Plans</a>
+    <a href="#nutrition">Nutrition Plans</a>
+    <a href="#progress">Progress</a>
+    <a href="/logout">Logout</a>
+    <%}%>
   </nav>
 </header>
 <style>
   .navbar a {
     display: block;
     text-decoration: none;
-    color: #02263a;
-    font-size: 15px;
+    color: #c9d9e1;
+    font-size: 18px;
     align-items: center;
     padding: 10px;
     border-radius: 5px;
   }
   .navbar > a:hover {
     background-color: #f7f7f796;
+    color: #02263a;
   }
   .hero {
     display: flex;

@@ -40,12 +40,22 @@ app.use(
 const publicRoutes = ["/", "/signup", "/login", "/about", "/logout"];
 const nutritionistRoutes = ["/nutritionist/dashboard", ...publicRoutes];
 const fit_instructorRoutes = ["/fit_instructor/dashboard", ...publicRoutes];
-const regular_userRoutes = ["/regular_user/dashboard", ...publicRoutes];
+const regular_userRoutes = [
+  "/regular_user/dashboard",
+  "/regular/available_plans",
+  ...publicRoutes,
+];
 const adminRoutes = [
   ...nutritionistRoutes,
   ...fit_instructorRoutes,
   ...regular_userRoutes,
 ];
+// middleware (good place to set res.locals)
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null; // make sure it's always defined
+  next();
+});
+
 app.use((req, res, next) => {
   if (req.session.user) {
     // Check if user is logged in
@@ -98,6 +108,7 @@ app.get("/signup", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
+function dataOnEjs() {}
 
 app.get("/regular_user/dashboard", (req, res) => {
   if (!req.session.user) {
@@ -124,13 +135,72 @@ app.get("/regular_user/dashboard", (req, res) => {
     });
   });
 });
+app.get("/regular/available_plans", (req, res) => {
+  dbConnection.query("SELECT * FROM meal_plans", (err, meals) => {
+    if (err) {
+      console.error("Error fetching plans:", err);
+      return res.status(500).send("Server Error");
+    }
+    dbConnection.query("SELECT * FROM workout_plans", (err, workouts) => {
+      if (err) {
+        console.error("Error fetching plans:", err);
+        return res.status(500).send("Server Error");
+      }
+      res.render("regular_user/available_plans.ejs", {
+        meals,
+        workouts,
+        username: req.session.user.username,
+      }); // 👈 Pass username to EJS
+    });
+  });
+});
 
 app.get("/nutritionist/dashboard", (req, res) => {
-  res.render("nutritionist/dashboard_N.ejs");
+  if (!req.session.user) {
+    return res.status(401).send("Unauthorized access");
+  }
+  dbConnection.query("SELECT * FROM users", (err, users) => {
+    if (err) {
+      console.error("Error fetching users:", err);
+
+      return res.status(500).send("Server Error");
+    }
+
+    dbConnection.query("SELECT * FROM roles", (err, roles) => {
+      if (err) {
+        console.error("Error fetching roles:", err);
+        return res.status(500).send("Server Error");
+      }
+      res.render("nutritionist/dashboard_N.ejs", {
+        users,
+        roles,
+        username: req.session.user.username, // 👈 Pass username to EJS
+      });
+    });
+  });
 });
 
 app.get("/fit_instructor/dashboard", (req, res) => {
-  res.render("fit_instructor/dashboard_I.ejs");
+  if (!req.session.user) {
+    return res.status(401).send("Unauthorized access");
+  }
+  dbConnection.query("SELECT * FROM users", (err, users) => {
+    if (err) {
+      console.error("Error fetching users:", err);
+      return res.status(500).send("Server Error");
+    }
+    dbConnection.query("SELECT * FROM roles", (err, roles) => {
+      if (err) {
+        console.error("Error fetching roles:", err);
+        return res.status(500).send("Server Error");
+      }
+      res.render("fit_instructor/dashboard_I.ejs", {
+        users,
+        roles,
+        username: req.session.user.username, // 👈 Pass username to EJS
+      });
+    });
+  });
 });
 
 // POST routes
