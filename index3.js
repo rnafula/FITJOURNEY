@@ -106,7 +106,7 @@ app.get("/regular_user/dashboard", (req, res) => {
   dbConnection.query("SELECT * FROM users", (err, users) => {
     if (err) {
       console.error("Error fetching users:", err);
-      dbConnection.end();
+
       return res.status(500).send("Server Error");
     }
 
@@ -152,10 +152,6 @@ app.post("/signup", (req, res) => {
   // Hash the password
   const hashedpassword = bcrypt.hashSync(password_hash, 10);
 
-  const dbConnection = mysql.createConnection(dbConfig);
-
-  dbConnection.connect();
-
   // Check if user already exists
   dbConnection.query(
     "SELECT * FROM users WHERE email = ?",
@@ -163,12 +159,11 @@ app.post("/signup", (req, res) => {
     (err, results) => {
       if (err) {
         console.error("DB Error:", err);
-        dbConnection.end();
+
         return res.status(500).send("Server error while checking user");
       }
 
       if (results.length > 0) {
-        dbConnection.end();
         return res.status(400).send("User already exists");
       }
 
@@ -177,8 +172,6 @@ app.post("/signup", (req, res) => {
         "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
         [username, email, hashedpassword],
         (error) => {
-          dbConnection.end();
-
           if (error) {
             console.error("DB Error:", error);
             return res.status(500).send("Server error while signing up");
@@ -203,40 +196,45 @@ app.post("/login", (req, res) => {
   // Look up user by username
   dbConnection.query(
     `SELECT 
-    users.password_hash,
     users.id AS user_id,
     users.username,
     users.email,
+    users.password_hash,
     roles.id AS role_id,
     roles.role
-FROM users
-JOIN user_roles ON users.id = user_roles.user_id
-JOIN roles ON user_roles.role_id = roles.id
-WHERE users.username = ?`,
-
+  FROM users
+  JOIN user_roles ON users.id = user_roles.user_id
+  JOIN roles ON user_roles.role_id = roles.id
+  WHERE users.username = ?`,
     [username],
     (err, results) => {
       if (err) {
         console.error("DB Error:", err);
         return res.status(500).send("Server error while checking user");
       }
+      console.log("Login query result:", results);
 
       if (results.length === 0) {
         return res.status(401).send("Invalid username or password");
       }
 
       const user = results[0];
+
+      // ✅ Check password correctly
       const isMatch = bcrypt.compareSync(password_hash, user.password_hash);
 
       if (!isMatch) {
-        return res.status(401).send("Invalid  password");
-      } else if (isMatch) {
-        req.session.user = user;
-        res.redirect("/");
+        return res.status(401).send("Invalid password");
       }
 
-      // Successful login
-      // return res.send(`Welcome back, ${user.username}!`);
+      req.session.user = {
+        id: user.user_id,
+        username: user.username,
+        email: user.email,
+        role: user.role.toLowerCase(), // Add role to session for access control
+      };
+
+      res.redirect("/");
     }
   );
 });
