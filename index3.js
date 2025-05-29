@@ -14,12 +14,12 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Database connection
-const dbConfig = {
+const dbConnection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
   database: "ft_db",
-};
+});
 
 // Connect to database and handle errors
 
@@ -46,37 +46,49 @@ const adminRoutes = [
   ...fit_instructorRoutes,
   ...regular_userRoutes,
 ];
-
 app.use((req, res, next) => {
-  console.log(req.path);
-  // Set user data for views if logged in
   if (req.session.user) {
-    res.locals.user = req.session.user;
-
-    const userRole = req.session.user.roles;
-    if (userRole == "nutritionist" && nutritionistRoutes.includes(req.path)) {
-      next();
-    } else if (
-      (userRole = "instructor" && fit_instructorRoutes.includes(req.path))
+    // Check if user is logged in
+    const userRole = req.session.user.role;
+    if (
+      (userRole === "nutritionist" && nutritionistRoutes.includes(req.path)) ||
+      (userRole === "instructor" && fit_instructorRoutes.includes(req.path)) ||
+      (userRole === "admin" && adminRoutes.includes(req.path)) ||
+      (userRole === "regular" && regular_userRoutes.includes(req.path))
     ) {
-      next();
-    } else if ((userRole = "admin" && adminRoutes.includes(req.path))) {
-      next();
+      return next(); // Allow access to authorized routes
     } else {
-      if ((userRole = "regular" && regular_userRoutes.includes(req.path))) {
-        next();
-      }
-    }
-  } else {
-    if (publicRoutes.includes(req.path)) {
-      next(); // Allow access to public routes
+      return res
+        .status(403)
+        .send("Forbidden: You do not have access to this route");
     }
   }
+  // If not logged in, check if the route is public
+  if (publicRoutes.includes(req.path)) {
+    return next(); // Allow access to public routes
+  }
+  // If not logged in and not a public route, deny access
+  return res
+    .status(401)
+    .send("Unauthorized: Please log in to access this route");
 });
 
-// Routes
 app.get("/", (req, res) => {
-  res.render("index.ejs");
+  if (req.session.user) {
+    // If user is logged in, redirect to their dashboard based on role
+    const userRole = req.session.user.role;
+    if (userRole === "nutritionist") {
+      return res.redirect("/nutritionist/dashboard");
+    } else if (userRole === "instructor") {
+      return res.redirect("/fit_instructor/dashboard");
+    } else if (userRole === "regular") {
+      return res.redirect("/regular_user/dashboard");
+    } else if (userRole === "admin") {
+      return res.redirect("/admin/dashboard");
+    }
+  } else {
+    res.render("index.ejs");
+  }
 });
 
 app.get("/signup", (req, res) => {
@@ -88,7 +100,29 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/regular_user/dashboard", (req, res) => {
-  res.render("regular_user/dashboard_R.ejs");
+  if (!req.session.user) {
+    return res.status(401).send("Unauthorized access");
+  }
+  dbConnection.query("SELECT * FROM users", (err, users) => {
+    if (err) {
+      console.error("Error fetching users:", err);
+      dbConnection.end();
+      return res.status(500).send("Server Error");
+    }
+
+    dbConnection.query("SELECT * FROM roles", (err, roles) => {
+      if (err) {
+        console.error("Error fetching roles:", err);
+        return res.status(500).send("Server Error");
+      }
+
+      res.render("regular_user/dashboard_R.ejs", {
+        users,
+        roles,
+        username: req.session.user.username, // 👈 Pass username to EJS
+      });
+    });
+  });
 });
 
 app.get("/nutritionist/dashboard", (req, res) => {
@@ -157,155 +191,56 @@ app.post("/signup", (req, res) => {
   );
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-// Login route
-/* app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+//login route
+app.post("/login", (req, res) => {
+  const { username, password_hash } = req.body;
 
-  dbConnection.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email],
-    (error, userData) => {
-      if (error) {
-        console.error("DB Error:", error);
-        return res.status(500).send("Server error while logging in");
-      }
+  // Validate input
+  if (!username || !password_hash) {
+    return res.status(400).send("Email and password are required");
+  }
 
-      if (userData.length === 0) {
-        return res.status(401).send("User not found, please sign up");
-      }
-
-      const user = userData[0];
-      const isPasswordValid = bcrypt.compareSync(password, user.password_hash);
-
-      if (!isPasswordValid) {
-        return res.status(401).send("Invalid password");
-      }
-
-      // ✅ Store session
-      req.session.user = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role_id: user.role_id,
-      };
-
-      // ✅ Redirect based on role_id
-      switch (user.role_id) {
-        case 1:
-          return res.redirect("/regular_user/dashboard");
-        case 2:
-          return res.redirect("/nutritionist/dashboard");
-        case 3:
-          return res.redirect("/fit_instructor/dashboard");
-        case 4:
-          return res.redirect("/admin/dashboard");
-        default:
-          return res.redirect("/"); // fallback
-      }
-    }
-  );
-}); */
-
-/* app.post("/login", (req, res) => {
-  const { email, password_hash } = req.body;
-
+  // Look up user by username
   dbConnection.query(
     `SELECT 
-  users.id,
-  users.username,
-  users.email,
-  users.password_hash,
-  users.role_id,
-  roles.name AS role_name
+    users.password_hash,
+    users.id AS user_id,
+    users.username,
+    users.email,
+    roles.id AS role_id,
+    roles.role
 FROM users
-JOIN roles ON users.role_id = roles.id
-WHERE users.email = ?;
-`,
-    [email],
-    (err, data) => {
+JOIN user_roles ON users.id = user_roles.user_id
+JOIN roles ON user_roles.role_id = roles.id
+WHERE users.username = ?`,
+
+    [username],
+    (err, results) => {
       if (err) {
-        console.error("Database error:", err);
-        return res.status(500).send("Error logging in");
+        console.error("DB Error:", err);
+        return res.status(500).send("Server error while checking user");
       }
 
-      if (data.length === 0) {
-        return res.status(401).send("User not found");
+      if (results.length === 0) {
+        return res.status(401).send("Invalid username or password");
       }
 
-      const user = data[0];
-      const isPasswordValid = bcrypt.compareSync(
-        password_hash,
-        user.password_hash
-      );
+      const user = results[0];
+      const isMatch = bcrypt.compareSync(password_hash, user.password_hash);
 
-      if (!isPasswordValid) {
-        return res.status(401).send("Invalid password");
+      if (!isMatch) {
+        return res.status(401).send("Invalid  password");
+      } else if (isMatch) {
+        req.session.user = user;
+        res.redirect("/");
       }
 
-      req.session.user = {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role_id: user.role_id,
-        role_name: user.role_name,
-      };
-
-      console.log("User logged in:", req.session.user);
-
-      // ✅ Role-based redirect
-      switch (user.role_name) {
-        case "admin":
-          return res.redirect("/admin/dashboard");
-        case "nutritionist":
-          return res.redirect("/nutritionist/dashboard");
-        case "instructor":
-          return res.redirect("/fit_instructor/dashboard");
-        default:
-          return res.redirect("/regular_user/dashboard");
-      }
+      // Successful login
+      // return res.send(`Welcome back, ${user.username}!`);
     }
   );
-}); */
-//login
-/* app.post("/login", (req, res) => {
-  const { email, password_hash } = req.body;
-  dbConnection.query(
-    `SELECT * FROM users WHERE email="${email}"`,
-    (error, userData) => {
-      if (error) {
-        res.status(500).send("server error");
-        console.error("Error fetching user data:", error);
-      } else {
-        console.log("userData", userData);
+});
 
-        if (userData.length == 0) {
-          res.status(401).send("User not found");
-        } else {
-          // user found - compate password using bcrypt
-          const user = userData[0];
-          const isPasswordValid = bcrypt.compareSync(
-            password,
-            user.password_hash
-          );
-          if (isPasswordValid) {
-            // password is valid - create session - express session middleware
-            req.session.user = user; // creating a session for the user
-            res.redirect("/"); // redirect to home page
-          } else {
-            // password is invalid
-            res.status(401).send("Invalid password");
-          }
-        }
-      }
-    }
-  );
-}); */
-// Logout route
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
