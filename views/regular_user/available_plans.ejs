@@ -13,30 +13,45 @@
         padding: 20px;
         margin: 10px 0;
       }
+      .meal-plans {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .workout-plans {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
     </style>
   </head>
   <body>
+    <%- include("../_header.ejs") %>
     <h1>
       Reach your fitness goals by choosing a meal and workout plan according to
       your needs
     </h1>
-    <%- include("../_header.ejs") %>
     <section>
       <div>
+        <%= meals.title %>
         <h2>Meal Plans</h2>
-        <% meals.forEach(meal =>{%>
-        <div class="meal-plan">
-          <h3><%= meal.title %></h3>
-          <p><%= meal.description %></p>
-          <p>Target: <%= meal.target_goal%> <%= meal.calories %> Calories</p>
-        </div>
+        <div class="meal-plans">
+          <% meals.forEach(meal =>{%>
+          <div class="meal-plan">
+            <h3><%= meal.title %></h3>
+            <p><%= meal.description %></p>
+            <p>Target: <%= meal.target_goal%> <%= meal.calories %> Calories</p>
+          </div>
 
-        <%})%>
+          <%})%>
+        </div>
       </div>
     </section>
     <section>
-      <div>
-        <h2>Workout Plans</h2>
+      <h2>Workout Plans</h2>
+      <div class="workout-plans">
         <% workouts.forEach(workout=>{%>
         <div class="workout-plan">
           <h3><%= workout.title %></h3>

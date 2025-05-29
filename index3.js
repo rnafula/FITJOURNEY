@@ -43,6 +43,7 @@ const fit_instructorRoutes = ["/fit_instructor/dashboard", ...publicRoutes];
 const regular_userRoutes = [
   "/regular_user/dashboard",
   "/regular/available_plans",
+  "/regular/profile",
   ...publicRoutes,
 ];
 const adminRoutes = [
@@ -153,6 +154,22 @@ app.get("/regular/available_plans", (req, res) => {
       }); // 👈 Pass username to EJS
     });
   });
+});
+app.get("/regular/profile", (req, res) => {
+  dbConnection.query(
+    "SELECT * FROM user_profiles WHERE username = ?",
+    [username],
+    (err, profiles) => {
+      if (err) {
+        console.error("Error fetching plans:", err);
+        return res.status(500).send("Server Error");
+      }
+      res.render("regular_user/profile.ejs", {
+        profiles,
+        username: req.session.user.username, // 👈 Pass username to EJS
+      });
+    }
+  );
 });
 
 app.get("/nutritionist/dashboard", (req, res) => {
