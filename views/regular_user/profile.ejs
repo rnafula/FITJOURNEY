@@ -5,16 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile</title>
     <style>
+      .profile_picture_text > img{
+        display: block;
+        width: 5%;
+        border-radius: 70%;
+        margin-left: 20px;
+
+      }
+      .profile_picture_text {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 20px;
+        gap:20px;
+      }
 
     </style>
   </head>
   <body>
     <%- include("../_header.ejs") %>
-   
-    <div>
-     <img src="" alt="">
-      <p>Username: <%= user.username %></p
- 
 
+    <div class="profile">
+      <div class="profile_picture_text">
+        <img src="<%= profile.profile_picture %>" alt="profile picture" />
+        <p> <h1><%= user.username %></h1></p>
+      </div>
+      <h1>Goal<%= profile.goal %></h1>
+      <p>Email: <%= user.email %></p>
+      <!-- from session -->
+      <p>Level<%= profile.activity_level  %></p>
+      <p>Gender: <%= profile.gender %></p>
+    </div>
   </body>
 </html>

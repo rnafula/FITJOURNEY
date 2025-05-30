@@ -61,6 +61,7 @@ app.use((req, res, next) => {
   if (req.session.user) {
     // Check if user is logged in
     const userRole = req.session.user.role;
+
     if (
       (userRole === "nutritionist" && nutritionistRoutes.includes(req.path)) ||
       (userRole === "instructor" && fit_instructorRoutes.includes(req.path)) ||
@@ -155,7 +156,7 @@ app.get("/regular/available_plans", (req, res) => {
     });
   });
 });
-app.get("/regular/profile", (req, res) => {
+/* app.get("/regular/profile", (req, res) => {
   dbConnection.query(
     "SELECT * FROM user_profiles WHERE username = ?",
     [username],
@@ -168,6 +169,28 @@ app.get("/regular/profile", (req, res) => {
         profiles,
         username: req.session.user.username, // 👈 Pass username to EJS
       });
+    }
+  );
+}); */
+app.get("/regular/profile", (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+
+  const userId = req.session.user.id;
+
+  // Query user_profiles table
+  dbConnection.query(
+    "SELECT * FROM user_profiles WHERE user_id = ?",
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
+      if (results.length === 0)
+        return res.status(404).send("Profile not found");
+
+      const profile = results[0];
+      res.render("regular_user/profile", { profile });
     }
   );
 });
