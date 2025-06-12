@@ -18,8 +18,8 @@ CREATE TABLE users (
 );
 --Role table
 CREATE TABLE roles (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50) NOT NULL UNIQUE
+  id INT  PRIMARY KEY,
+  role ENUM('Regular','Nutritionist','Instructor','Admin') DEFAULT 'Regular',;
 );
 
 CREATE TABLE user_roles (

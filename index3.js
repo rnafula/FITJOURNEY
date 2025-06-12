@@ -44,6 +44,8 @@ const regular_userRoutes = [
   "/regular_user/dashboard",
   "/regular/available_plans",
   "/regular/profile",
+  "/regular/my_plans",
+
   ...publicRoutes,
 ];
 const adminRoutes = [
@@ -58,6 +60,9 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+  console.log("Incoming request:", req.method, req.path);
+  console.log("Session user:", req.session.user);
+
   if (req.session.user) {
     // Check if user is logged in
     const userRole = req.session.user.role;
@@ -66,7 +71,10 @@ app.use((req, res, next) => {
       (userRole === "nutritionist" && nutritionistRoutes.includes(req.path)) ||
       (userRole === "instructor" && fit_instructorRoutes.includes(req.path)) ||
       (userRole === "admin" && adminRoutes.includes(req.path)) ||
-      (userRole === "regular" && regular_userRoutes.includes(req.path))
+      (userRole === "regular" &&
+        regular_userRoutes.some((route) =>
+          req.path.startsWith(route)
+        )) /* (userRole === "regular" && regular_userRoutes.includes(req.path)) */
     ) {
       return next(); // Allow access to authorized routes
     } else {
@@ -110,7 +118,6 @@ app.get("/signup", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
-function dataOnEjs() {}
 
 app.get("/regular_user/dashboard", (req, res) => {
   if (!req.session.user) {
@@ -152,26 +159,75 @@ app.get("/regular/available_plans", (req, res) => {
         meals,
         workouts,
         username: req.session.user.username,
+        userId: req.session.user.id, // 👈 Pass userId to EJS
       }); // 👈 Pass username to EJS
     });
   });
 });
-/* app.get("/regular/profile", (req, res) => {
+app.get("/regular/my_plans", (req, res) => {
+  res.status(400).redirect("/regular/available_plans");
+});
+
+app.get("/regular/my_plans/:id", (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  const planId = req.params.id;
+  /* 
+ 
+    // your DB connection (MySQL or whatever you use)
+    `
+      SELECT ...
+FROM meal_plans mp
+JOIN meal_days md ON md.meal_plan_id = mp.id
+JOIN meals m ON m.meal_day_id = md.id
+LEFT JOIN meal_items mi ON mi.meal_id = m.id
+WHERE mp.id = ?
+
+    `,
+    [planId],
+    (err, results) => {
+      if (err) return res.status(500).send("Database error");
+      if (results.length === 0)
+        return res.status(404).send("Meal plannot found");
+
+      res.render("regular_user/my_plans.ejs", { my_plan: results });
+    }
+  ); */
   dbConnection.query(
-    "SELECT * FROM user_profiles WHERE username = ?",
-    [username],
-    (err, profiles) => {
+    `
+    SELECT 
+      mp.title AS meal_plan,
+      md.day_number,
+      m.type AS meal_type,
+      m.notes AS meal_notes,
+      mi.name AS item_name,
+      mi.quantity,
+      mi.calories
+    FROM meal_plans mp
+    JOIN meal_days md ON md.meal_plan_id = mp.id
+    JOIN meals m ON m.meal_day_id = md.id
+    LEFT JOIN meal_items mi ON mi.meal_id = m.id
+    WHERE mp.id = ?
+    ORDER BY md.day_number, FIELD(m.type, 'breakfast', 'lunch', 'dinner')
+  `,
+    [planId],
+    (err, results) => {
       if (err) {
-        console.error("Error fetching plans:", err);
-        return res.status(500).send("Server Error");
+        console.error("💥 DB Error:", err); // <-- log real SQL error
+        return res.status(500).send("Database error");
       }
-      res.render("regular_user/profile.ejs", {
-        profiles,
-        username: req.session.user.username, // 👈 Pass username to EJS
-      });
+
+      if (results.length === 0) {
+        return res.status(404).send("Meal plan not found");
+      }
+
+      res.render("regular_user/my_plans.ejs", { my_plan: results });
     }
   );
-}); */
+});
+
 app.get("/regular/profile", (req, res) => {
   // Check if user is logged in
   if (!req.session.user) {
@@ -345,6 +401,28 @@ app.post("/login", (req, res) => {
       };
 
       res.redirect("/");
+    }
+  );
+});
+
+// POST /api/user-meal-plans
+app.post("/regular/available_plans", (req, res) => {
+  console.log(req.body);
+  const userId = req.session.user.id; // Get user ID from session
+  const { mealPlanId } = req.body;
+  const startDate = new Date().toISOString().split("T")[0];
+  const daysCount = 3;
+
+  dbConnection.query(
+    `INSERT INTO user_meals(user_id, meal_plan_id, start_date, days_count)
+     VALUES (?, ?, ?, ?)`,
+    [userId, mealPlanId, startDate, daysCount],
+    (err, result) => {
+      if (err) {
+        console.error("Error saving plan:", err);
+        return res.status(500).send("Error saving plan");
+      }
+      res.redirect("/regular/available_plans");
     }
   );
 });
