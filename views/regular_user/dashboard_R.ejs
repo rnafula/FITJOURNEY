@@ -4,43 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Regular User Dashboard</title>
-    <!-- <style>
-      a {
-        background-color: #82c3e6;
-        display: block;
-        text-decoration: none;
-        color: #02263a;
-        font-size: 2rem;
-        align-items: center;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .hero {
-        display: flex;
-        justify-content: space-evenly;
-        align-items: center;
-        background-color: #bbdcee;
-      }
-      .hero img {
-        display: block;
-        width: 8%;
-      }
-      .navbar {
-        display: flex;
-        gap: 20px;
-      }
-      h1 {
-        text-align: center;
-        font-size: 2rem;
-      }
-    </style> -->
+    <link rel="stylesheet" href="/styles/regulardash.css" />
   </head>
   <body>
     <%- include("../_header.ejs") %>
 
     <main>
-      <h1>Hi, <%= username %></h1>
+      <h1>Welcome back <%= username %></h1>
+      <section>
+        <div class="summary">
+          <div class="summary_item">
+            <h2>Meals</h2>
+            <p>Total: <%= meals.length %></p>
+          </div>
+          <div class="summary_item">
+            <h2>Progress</h2>
+            <p>Last Updated: <%= lastUpdated %></p>
+          </div>
+        </div>
+        <div class="progress">
+          <h2>Progress Overview</h2>
+          <p>Track your fitness journey with our progress charts.</p>
+          <div class="progress_chart">
+            <!-- Placeholder for progress chart -->
+            <img
+              src="/images/progress_chart_placeholder.png"
+              alt="Progress Chart"
+            />
+          </div>
+        </div>
+        <div class="recommendation">
+          <h2>Recommendations</h2>
+          <p>Based on your activity, we recommend:</p>
+          <ul>
+            <% recommendations.forEach(function(rec) { %>
+            <div><%= rec %></div>
+            <% }); %>
+          </ul>
+        </div>
+        <div class="quick_actions">
+          <h2>Quick Actions</h2>
+          <div class="action_buttons">
+            <div><a href="/regular/available_plans">View Workouts</a></div>
+            <div><a href="/regular/available_plans">View Meal Plans</a></div>
+            <div><a href="/progress">View Progress</a></div>
+            <div><a href="/settings">Account Settings</a></div>
+          </div>
+        </div>
+      </section>
     </main>
-    <div>You are among the <%= users.length %> users</div>
   </body>
 </html>

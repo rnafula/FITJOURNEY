@@ -83,6 +83,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/images/logobg" type="image/x-icon" />
+
     <title>Workout plans</title>
     <style>
       .meal-plan,
@@ -130,7 +132,11 @@
             <p>Target: <%= meal.target_goal %></p>
             <p>Duration: <%= meal.days_count %> Days</p>
 
-            <form method="get" action="/regular/my_plans/<%=meal.id %>">
+            <form
+              method="post"
+              action="/regular/my_plans/<%=meal.id %>"
+              onsubmit="return confirmChoice()"
+            >
               <button type="submit">Choose Plan</button>
             </form>
           </div>
@@ -149,11 +155,16 @@
           <p>Level: <%= workout.difficulty %></p>
           <p>Duration: <%= workout.duration_minutes %> Minutes</p>
           <p>Target: <%= workout.target_goal %></p>
-          <button type="submit">Choose Plan</button>
+          <button type="submit" disabled>Choose Plan-Coming Soon</button>
           <!-- You can hook this up later -->
         </div>
         <% }) %>
       </div>
     </section>
+    <script>
+      function confirmChoice() {
+        return confirm("Are you sure you want to choose this meal plan?");
+      }
+    </script>
   </body>
 </html>

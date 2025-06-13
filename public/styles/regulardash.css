@@ -1,0 +1,99 @@
+/* Reset some defaults */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f9fc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Summary Cards */
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.summary_item {
+  flex: 1;
+  background-color: #a2d0e8;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Progress Section */
+.progress {
+  background-color: #a2d0e8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.progress_chart img {
+  max-width: 100%;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+/* Recommendations */
+.recommendation {
+  background-color: #a2d0e8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.recommendation ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+}
+
+/* Quick Actions */
+.quick_actions {
+  background-color: #a2d0e8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.action_buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action_buttons a {
+  display: block;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  background-color: #076396;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.action_buttons a:hover {
+  background-color: #3c9742;
+}

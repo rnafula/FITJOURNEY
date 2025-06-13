@@ -45,6 +45,7 @@ const regular_userRoutes = [
   "/regular/available_plans",
   "/regular/profile",
   "/regular/my_plans",
+  "/regular/saved_meal_plans",
 
   ...publicRoutes,
 ];
@@ -118,8 +119,50 @@ app.get("/signup", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
+app.get("/regular_user/dashboard", async (req, res) => {
+  const userId = req.session.user.id;
 
-app.get("/regular_user/dashboard", (req, res) => {
+  if (!userId) return res.redirect("/login");
+
+  try {
+    // Fetch data from DB
+    const users = await dbConnection.query("SELECT * FROM users WHERE id = ?", [
+      userId,
+    ]);
+    /*    const workouts = await dbConnection.query(
+      "SELECT * FROM workout_plans WHERE user_id = ?",
+      [userId]
+    ); */
+    const meals = await dbConnection.query(
+      "SELECT * FROM user_meal_plans WHERE user_id = ?",
+      [userId]
+    );
+    const progress = await dbConnection.query(
+      "SELECT * FROM progress_logs WHERE user_id = ? ",
+      [userId]
+    );
+    const recommendations = [
+      "Stay hydrated",
+      "Try a 30-minute walk today",
+      "Include more protein in lunch",
+    ]; // Placeholder
+
+    res.render("regular_user/dashboard_R.ejs", {
+      username: req.session.user.username || "User",
+      users,
+      user: req.session.user,
+
+      meals,
+      lastUpdated: progress,
+      recommendations,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error loading dashboard");
+  }
+});
+
+/* app.get("/regular_user/dashboard", (req, res) => {
   if (!req.session.user) {
     return res.status(401).send("Unauthorized access");
   }
@@ -143,7 +186,7 @@ app.get("/regular_user/dashboard", (req, res) => {
       });
     });
   });
-});
+}); */
 app.get("/regular/available_plans", (req, res) => {
   dbConnection.query("SELECT * FROM meal_plans", (err, meals) => {
     if (err) {
@@ -164,68 +207,80 @@ app.get("/regular/available_plans", (req, res) => {
     });
   });
 });
-app.get("/regular/my_plans", (req, res) => {
-  res.status(400).redirect("/regular/available_plans");
-});
-
+// ====== ROUTE TO SELECT AND SAVE A MEAL PLAN ======
 app.get("/regular/my_plans/:id", (req, res) => {
-  // Check if user is logged in
   if (!req.session.user) {
     return res.redirect("/login");
   }
+
   const planId = req.params.id;
-  /* 
- 
-    // your DB connection (MySQL or whatever you use)
-    `
-      SELECT ...
-FROM meal_plans mp
-JOIN meal_days md ON md.meal_plan_id = mp.id
-JOIN meals m ON m.meal_day_id = md.id
-LEFT JOIN meal_items mi ON mi.meal_id = m.id
-WHERE mp.id = ?
+  const userId = req.session.user.id;
 
-    `,
-    [planId],
-    (err, results) => {
-      if (err) return res.status(500).send("Database error");
-      if (results.length === 0)
-        return res.status(404).send("Meal plannot found");
-
-      res.render("regular_user/my_plans.ejs", { my_plan: results });
-    }
-  ); */
+  // Save plan for user (insert if not already saved)
   dbConnection.query(
-    `
-    SELECT 
-      mp.title AS meal_plan,
-      md.day_number,
-      m.type AS meal_type,
-      m.notes AS meal_notes,
-      mi.name AS item_name,
-      mi.quantity,
-      mi.calories
-    FROM meal_plans mp
-    JOIN meal_days md ON md.meal_plan_id = mp.id
-    JOIN meals m ON m.meal_day_id = md.id
-    LEFT JOIN meal_items mi ON mi.meal_id = m.id
-    WHERE mp.id = ?
-    ORDER BY md.day_number, FIELD(m.type, 'breakfast', 'lunch', 'dinner')
-  `,
-    [planId],
-    (err, results) => {
+    `INSERT IGNORE INTO user_meal_plans (user_id, meal_plan_id) VALUES (?, ?)`,
+    [userId, planId],
+    (err) => {
       if (err) {
-        console.error("💥 DB Error:", err); // <-- log real SQL error
-        return res.status(500).send("Database error");
+        console.error("Save error:", err);
+        return res.status(500).send("Error saving plan");
       }
 
-      if (results.length === 0) {
-        return res.status(404).send("Meal plan not found");
-      }
+      // Fetch the full breakdown of the meal plan
+      const sql = `
+        SELECT 
+          mp.title AS meal_plan,
+          md.day_number,
+          m.type AS meal_type,
+          m.notes AS meal_notes,
+          mi.name AS item_name,
+          mi.quantity,
+          mi.calories
+        FROM meal_plans mp
+        JOIN meal_days md ON md.meal_plan_id = mp.id
+        JOIN meals m ON m.meal_day_id = md.id
+        LEFT JOIN meal_items mi ON mi.meal_id = m.id
+        WHERE mp.id = ?
+        ORDER BY md.day_number, FIELD(m.type, 'breakfast', 'lunch', 'dinner')
+      `;
 
-      res.render("regular_user/my_plans.ejs", { my_plan: results });
+      dbConnection.query(sql, [planId], (err, results) => {
+        if (err) {
+          console.error("DB Error:", err);
+          return res.status(500).send("Database error");
+        }
+
+        if (results.length === 0) {
+          return res.status(404).send("Meal plan not found");
+        }
+
+        res.render("regular_user/my_plans.ejs", { my_plan: results });
+      });
     }
   );
+});
+
+// ====== ROUTE TO LIST SAVED PLANS ======
+app.get("/regular/saved_meal_plans", (req, res) => {
+  if (!req.session.user) return res.redirect("/login");
+
+  const userId = req.session.user.id;
+  dbConnection.query(
+    `
+    SELECT mp.id, mp.title
+    FROM user_meal_plans ump
+    JOIN meal_plans mp ON mp.id = ump.meal_plan_id
+    WHERE ump.user_id = ?
+    `,
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).send("DB error");
+      res.render("regular_user/saved_meal_plans.ejs", { my_plans: results });
+    }
+  );
+});
+app.post("/regular/my_plans/:id", (req, res) => {
+  res.redirect(`/regular/my_plans/${req.params.id}`);
 });
 
 app.get("/regular/profile", (req, res) => {
@@ -405,24 +460,16 @@ app.post("/login", (req, res) => {
   );
 });
 
-// POST /api/user-meal-plans
-app.post("/regular/available_plans", (req, res) => {
-  console.log(req.body);
-  const userId = req.session.user.id; // Get user ID from session
-  const { mealPlanId } = req.body;
-  const startDate = new Date().toISOString().split("T")[0];
-  const daysCount = 3;
+app.post("/regular/my_plans/:id", (req, res) => {
+  const userId = req.session.user.id;
+  const planId = req.params.id;
 
   dbConnection.query(
-    `INSERT INTO user_meals(user_id, meal_plan_id, start_date, days_count)
-     VALUES (?, ?, ?, ?)`,
-    [userId, mealPlanId, startDate, daysCount],
-    (err, result) => {
-      if (err) {
-        console.error("Error saving plan:", err);
-        return res.status(500).send("Error saving plan");
-      }
-      res.redirect("/regular/available_plans");
+    `INSERT IGNORE INTO user_meal_plans (user_id, meal_plan_id) VALUES (?, ?)`,
+    [userId, planId],
+    (err) => {
+      if (err) return res.status(500).send("Error saving plan");
+      res.redirect("/regular/my_plans"); // go to all saved plans
     }
   );
 });

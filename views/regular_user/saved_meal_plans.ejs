@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saved meal-plans</title>
+  </head>
+  <body>
+    <h2>My Saved Meal Plans</h2>
+    <% if (my_plans.length === 0) { %>
+    <p>You haven't saved any plans yet.</p>
+    <% } else { %>
+    <ul>
+      <% my_plans.forEach(plan => { %>
+      <li>
+        <h3><%= plan.title %></h3>
+        <a href="/regular/my_plans/<%= plan.id %>">View Full Plan</a>
+      </li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </body>
+</html>

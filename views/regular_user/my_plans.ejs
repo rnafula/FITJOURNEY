@@ -1,69 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Meal Plan</title>
-  <style>
-    .day-section {
-      background-color: #f4f9ff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    .meal {
-      margin-left: 20px;
-    }
-    .meal-type {
-      font-weight: bold;
-      color: #076396;
-    }
-    .item {
-      margin-left: 20px;
-    }
-  </style>
-</head>
-<body>
-  <%- include("../_header.ejs") %>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <%- include("../_header.ejs") %>
 
-  <h1>Meal Plan: <%= my_plan[0].meal_plan %></h1>
+    <h1>Meal Plan Breakdown: <%= my_plan[0].meal_plan %></h1>
 
-  <% 
-    let currentDay = null;
-    let currentMealType = null;
-  %>
-
-  <% my_plan.forEach(entry => { %>
-    <% if (currentDay !== entry.day_number) { 
-         currentDay = entry.day_number;
-         currentMealType = null;
-    %>
-      <div class="day-section">
-        <h2>Day <%= entry.day_number %></h2>
+    <% let currentDay = 0; %> <% my_plan.forEach((entry, index) => { %> <% if
+    (entry.day_number !== currentDay) { %> <% currentDay = entry.day_number; %>
+    <h2>Day <%= currentDay %></h2>
     <% } %>
 
-    <% if (currentMealType !== entry.meal_type) {
-         currentMealType = entry.meal_type;
-    %>
-      <div class="meal">
-        <p class="meal-type"><%= entry.meal_type.toUpperCase() %>:</p>
-        <p><%= entry.meal_notes %></p>
-    <% } %>
-
-        <div class="item">
-          <p>• <%= entry.item_name %> - <%= entry.quantity %> ( <%= entry.calories %> kcal )</p>
-        </div>
-
-    <% 
-      const next = my_plan[my_plan.indexOf(entry) + 1];
-      if (!next || next.day_number !== entry.day_number) {
-    %>
-        </div> <!-- Close last meal of the day -->
-      </div> <!-- Close day-section -->
-    <% } else if (next.meal_type !== entry.meal_type) { %>
-        </div> <!-- Close current meal -->
-    <% } %>
-  <% }) %>
-</body>
+    <h3><%= entry.meal_type %></h3>
+    <p><%= entry.meal_notes %></p>
+    <ul>
+      <li>
+        <strong><%= entry.item_name %></strong> - <%= entry.quantity %> ( <%=
+        entry.calories %> cal )
+      </li>
+    </ul>
+    <% }) %>
+  </body>
 </html>
