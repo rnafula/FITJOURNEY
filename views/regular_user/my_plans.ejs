@@ -3,26 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Plan details</title>
+    <style>
+      .details {
+        display: flex;
+        flex-direction: row;
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f4f8;
+        border-radius: 10px;
+        gap: 20px;
+      }
+      .plan-details {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #92d5de;
+        border-radius: 8px;
+      }
+    </style>
   </head>
   <body>
     <%- include("../_header.ejs") %>
 
     <h1>Meal Plan Breakdown: <%= my_plan[0].meal_plan %></h1>
+    <section class="details">
+      <% let currentDay = 0; %> <% my_plan.forEach((entry, index) => { %> <% if
+      (entry.day_number !== currentDay) { %> <% currentDay = entry.day_number;
+      %>
+      <section class="plan-details">
+        <h2>Day <%= currentDay %></h2>
+        <% } %>
 
-    <% let currentDay = 0; %> <% my_plan.forEach((entry, index) => { %> <% if
-    (entry.day_number !== currentDay) { %> <% currentDay = entry.day_number; %>
-    <h2>Day <%= currentDay %></h2>
-    <% } %>
-
-    <h3><%= entry.meal_type %></h3>
-    <p><%= entry.meal_notes %></p>
-    <ul>
-      <li>
-        <strong><%= entry.item_name %></strong> - <%= entry.quantity %> ( <%=
-        entry.calories %> cal )
-      </li>
-    </ul>
-    <% }) %>
+        <h3><%= entry.meal_type %></h3>
+        <p><%= entry.meal_notes %></p>
+        <ul>
+          <li>
+            <strong><%= entry.item_name %></strong> - <%= entry.quantity %> (
+            <%= entry.calories %> cal )
+          </li>
+        </ul>
+        <% if(index === my_plan.length - 1) { %>
+      </section>
+      <%}%> <% }) %>
+    </section>
   </body>
 </html>

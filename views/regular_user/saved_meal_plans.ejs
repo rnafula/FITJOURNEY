@@ -4,20 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Saved meal-plans</title>
+    <link rel="stylesheet" href="/styles/savedplans.css" />
   </head>
   <body>
-    <h2>My Saved Meal Plans</h2>
-    <% if (my_plans.length === 0) { %>
-    <p>You haven't saved any plans yet.</p>
-    <% } else { %>
-    <ul>
-      <% my_plans.forEach(plan => { %>
-      <li>
-        <h3><%= plan.title %></h3>
-        <a href="/regular/my_plans/<%= plan.id %>">View Full Plan</a>
-      </li>
-      <% }) %>
-    </ul>
+    <%- include("../_header.ejs") %> <% if (saved) { %>
+    <p class="success" id="flash-message">Meal plan saved successfully!</p>
     <% } %>
+    <h2>My Saved Meal Plans</h2>
+    <main>
+      <% if (my_plans.length === 0) { %>
+      <p>You haven't saved any plans yet.</p>
+      <% } else { %>
+      <ol class="plan-list">
+        <% my_plans.forEach(plan => { %>
+        <li class="plan-item">
+          <h3><%= plan.title %></h3>
+          <a href="/regular/my_plans/<%= plan.id %>">View Full Plan</a>
+        </li>
+        <% }) %>
+      </ol>
+      <% } %>
+    </main>
+    <script>
+      const flash = document.getElementById("flash-message");
+      if (flash) {
+        setTimeout(() => {
+          flash.style.display = "none";
+        }, 3000); // 3 seconds
+      }
+    </script>
   </body>
 </html>

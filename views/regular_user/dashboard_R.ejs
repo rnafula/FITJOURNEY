@@ -10,7 +10,7 @@
     <%- include("../_header.ejs") %>
 
     <main>
-      <h1>Welcome back <%= username %></h1>
+      <h1>Welcome back, <span><%= username %></span></h1>
       <section>
         <div class="summary">
           <div class="summary_item">
@@ -19,7 +19,7 @@
           </div>
           <div class="summary_item">
             <h2>Progress</h2>
-            <p>Last Updated: <%= lastUpdated %></p>
+            <p>Current Weight: <%= progress.weight %></p>
           </div>
         </div>
         <div class="progress">
@@ -37,8 +37,8 @@
           <h2>Recommendations</h2>
           <p>Based on your activity, we recommend:</p>
           <ul>
-            <% recommendations.forEach(function(rec) { %>
-            <div><%= rec %></div>
+            <% recommendations.forEach((recommendation)=> { %>
+            <li><%= recommendation %></li>
             <% }); %>
           </ul>
         </div>

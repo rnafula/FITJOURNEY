@@ -151,9 +151,8 @@ app.get("/regular_user/dashboard", async (req, res) => {
       username: req.session.user.username || "User",
       users,
       user: req.session.user,
-
       meals,
-      lastUpdated: progress,
+      progress,
       recommendations,
     });
   } catch (error) {
@@ -202,7 +201,8 @@ app.get("/regular/available_plans", (req, res) => {
         meals,
         workouts,
         username: req.session.user.username,
-        userId: req.session.user.id, // 👈 Pass userId to EJS
+        userId: req.session.user.id,
+        error: req.query.err, // 👈 Pass userId to EJS
       }); // 👈 Pass username to EJS
     });
   });
@@ -275,13 +275,17 @@ app.get("/regular/saved_meal_plans", (req, res) => {
     [userId],
     (err, results) => {
       if (err) return res.status(500).send("DB error");
-      res.render("regular_user/saved_meal_plans.ejs", { my_plans: results });
+      res.render("regular_user/saved_meal_plans.ejs", {
+        my_plans: results,
+        saved: req.query.saved,
+        error: req.query.err,
+      });
     }
   );
 });
-app.post("/regular/my_plans/:id", (req, res) => {
-  res.redirect(`/regular/my_plans/${req.params.id}`);
-});
+/* app.post("/regular/my_plans/:id", (req, res) => {
+  res.redirect("/regular/saved_meal_plans?saved=1");
+}); */
 
 app.get("/regular/profile", (req, res) => {
   // Check if user is logged in
@@ -468,8 +472,13 @@ app.post("/regular/my_plans/:id", (req, res) => {
     `INSERT IGNORE INTO user_meal_plans (user_id, meal_plan_id) VALUES (?, ?)`,
     [userId, planId],
     (err) => {
-      if (err) return res.status(500).send("Error saving plan");
-      res.redirect("/regular/my_plans"); // go to all saved plans
+      if (err) {
+        console.log("Error saving plan:", err);
+
+        return res.redirect("/regular/availabe_plans?error=1");
+      }
+      // go to all saved plans
+      res.redirect("/regular/saved_meal_plans?saved=1");
     }
   );
 });

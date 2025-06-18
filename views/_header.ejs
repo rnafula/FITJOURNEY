@@ -3,7 +3,7 @@
 
   <nav class="navbar">
     <%if (user && user.role === 'nutritionist'){%>
-    <a href="/">Home</a>
+    <a href="/">Dashboard</a>
     <!--     <a href="https:/wa.me/+254790472140">Contact Us</a> -->
     <a href="#profile">Profile</a>
     <a href="#workout">Premium</a>
@@ -11,7 +11,7 @@
     <a href="#progress">Progress</a>
     <a href="/logout">Logout</a>
     <%} else if (user && user.role === 'instructor'){%>
-    <a href="/">Home</a>
+    <a href="/">Dashboard</a>
     <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
  -->
     <a href="#profile">Profile</a>
@@ -20,7 +20,7 @@
     <a href="#progress">Progress</a>
     <a href="/logout">Logout</a>
     <%} else if (user && user.role === 'regular'){%>
-    <a href="/">Home</a>
+    <a href="/">Dashboard</a>
     <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
  -->
     <a href="/regular/available_plans">Available Plans</a>
@@ -29,7 +29,7 @@
     <a href="/regular/profile">Profile</a>
     <a href="/logout">Logout</a>
     <%} else if (user && user.role === 'admin'){%>
-    <a href="/">Home</a>
+    <a href="/">Dashboard</a>
     <!--     <a href="https:/wa.me/+254790472140">Contact Us</a>
  -->
     <a href="#workout">Workout Plans</a>
@@ -38,7 +38,7 @@
     <a href="/regular/profile">Profile</a>
     <a href="/logout">Logout</a>
     <%} else{%>
-    <a href="/">Home</a>
+    <a href="/">Dashboard</a>
     <a href="https:/wa.me/+254790472140">Contact Us</a>
     <a href="#profile">Profile</a>
     <a href="#workout">Workout Plans</a>
@@ -63,6 +63,11 @@
     color: #02263a;
   }
   .hero {
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     padding: 20px;
@@ -70,9 +75,9 @@
     background-color: #076396;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   }
-  .hero img {
+  .hero > a > img {
     display: block;
-    width: 6%;
+    width: 9%;
     background-color: #a2d0e8;
     border-radius: 5px;
   }
