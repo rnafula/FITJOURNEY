@@ -77,3 +77,7 @@ FitJourney is a web application designed to help users track and manage their fi
 ## License
 
 This project is a proprietary software (closed source) .
+
+## UI SCREENSHOTS
+
+![Dashboard Screenshot](Landing page.png)
