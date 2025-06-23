@@ -81,12 +81,14 @@ This project is a proprietary software (closed source) .
 ## UI SCREENSHOTS
 
 ![Dashboard Screenshot](/UI%20Screenshots/Landing%20page.png)
+![Dashboard Screenshot](/UI%20Screenshots/Registeration%20form.png)
 ![Dashboard Screenshot](/UI%20Screenshots/login%20form.png)
+![Dashboard Screenshot](/UI%20Screenshots/Regular%20user%20dashboard.png)
+
 ![Dashboard Screenshot](/UI%20Screenshots/chosen%20meal%20plans.png)
 ![Dashboard Screenshot](/UI%20Screenshots/Instructor's%20dashboard.png)
 ![Dashboard Screenshot](/UI%20Screenshots/Meal%20plans.png)
 ![Dashboard Screenshot](/UI%20Screenshots/Nutritionist%20dashboard.png)
-![Dashboard Screenshot](/UI%20Screenshots/Registeration%20form.png)
 ![Dashboard Screenshot](/UI%20Screenshots/mobile_chosen%20meal%20plans.png)
 ![Dashboard Screenshot](/UI%20Screenshots/mobile_landing%20page.png)
 ![Dashboard Screenshot](/UI%20Screenshots/mobile_meal%20plans.png)
