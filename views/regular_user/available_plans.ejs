@@ -50,17 +50,28 @@
         border-radius: 5px;
         margin-bottom: 10px;
       }
+      @media (max-width: 768px) {
+        .meal-plan,
+        .workout-plan {
+          background-color: #a2d0e8;
+          border: 1px solid #d1d9e6;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 10px 0;
+          width: 80%;
+        }
+      }
     </style>
   </head>
   <body>
     <%- include("../_header.ejs") %> <% if (error){ %>
     <p class="error">Plan already saved, choose another one</p>
     <% } %>
-    <h1>
+    <h2>
       Choose a <a href="#meal" class="short-cut">meal</a> or
       <a href="#workout" class="short-cut">workout</a> plan according to your
       needs
-    </h1>
+    </h2>
 
     <section>
       <div>

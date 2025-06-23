@@ -253,7 +253,7 @@ app.get("/regular/my_plans/:id", (req, res) => {
         if (results.length === 0) {
           return res.status(404).send("Meal plan not found");
         }
-
+        console.log("Meal plan results:", results);
         res.render("regular_user/my_plans.ejs", { my_plan: results });
       });
     }
